@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+
+import { useKey } from './useKey';
 
 import StarRating from './StarRating';
 import Loader from './Loader';
@@ -7,6 +9,12 @@ const MovieDetails = ({ selectedId, onCloseMovie, onAddWatched, watched }) => {
   const [movie, setMovie] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [userRating, setUserRating] = useState('');
+
+  const countRef = useRef(0);
+
+  useEffect(() => {
+    if (userRating) countRef.current++;
+  }, [userRating]);
 
   const isWatched = watched.find(movie => movie.imdbID === selectedId);
   const watchedUserRating = isWatched?.userRating;
@@ -36,20 +44,14 @@ const MovieDetails = ({ selectedId, onCloseMovie, onAddWatched, watched }) => {
         const runTime = +runtime.split(' ')[0];
         return !isNaN(+runTime) ? runTime : 0;
       })(),
+      countRatingDecisions: countRef.current,
     };
 
     onAddWatched(newWatchedMovie);
     onCloseMovie();
   };
 
-  useEffect(() => {
-    const callback = e => {
-      if (e.code === 'Escape') onCloseMovie();
-    };
-    document.addEventListener('keydown', callback);
-
-    return () => document.removeEventListener('keydown', callback);
-  }, [onCloseMovie]);
+  useKey('Escape', onCloseMovie);
 
   useEffect(() => {
     const getMovieDetails = async () => {
