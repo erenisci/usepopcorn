@@ -9,8 +9,6 @@ const Search = ({ query, setQuery }) => {
     if (document.activeElement !== inputElement.current) {
       inputElement.current.focus();
       setQuery('');
-    } else if (document.activeElement === inputElement.current) {
-      inputElement.current.blur();
     }
   });
 
